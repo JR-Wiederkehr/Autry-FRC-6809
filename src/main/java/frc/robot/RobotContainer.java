@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.util.List;
+
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,20 +16,23 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PneumaticSubsystem;
-import java.util.List;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -40,32 +46,33 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
 	PneumaticSubsystem m_pneumatic = new PneumaticSubsystem();
+  ArmSubsystem m_arm = new ArmSubsystem();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    // Configure the button bindings
-    configureButtonBindings();
-		// Configure the dashboard
-		configureSmartDashboard();
+// The driver's controller
+//XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+Joystick m_driverController2 = new Joystick(OIConstants.kDriverControllerPort);
 
-    // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true),
-            m_robotDrive));
-  }
+/**
+ * The container for the robot. Contains subsystems, OI devices, and commands.
+ */
+public RobotContainer() {
+  // Configure the button bindings
+  configureButtonBindings();
+  // Configure the dashboard
+  configureSmartDashboard();
 
+  // Configure default commands
+  m_robotDrive.setDefaultCommand(
+      // The joystick controls translation and rotation of the robot.
+      new RunCommand(
+          () -> m_robotDrive.drive(
+              -MathUtil.applyDeadband(m_driverController2.getY(), OIConstants.kDriveDeadband), // Y-axis for forward/backward
+              -MathUtil.applyDeadband(m_driverController2.getX(), OIConstants.kDriveDeadband), // X-axis for left/right
+              -MathUtil.applyDeadband(m_driverController2.getZ(), OIConstants.kDriveDeadband), // Z-axis for rotation
+              true),
+          m_robotDrive));
+}
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -76,16 +83,48 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
+    new JoystickButton(m_driverController2, 6)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
-//Example code for controlling a pneumatic solenoid.
-		/* new JoystickButton(m_driverController, Button.kR2.value)
-        .whileTrue(new RunCommand(
-            () -> m_pneumatic.setArmStatus(1, Value.kOff),
-          	m_pneumatic));
-		*/
+
+       new JoystickButton(m_driverController2, 7)
+        .onTrue(new InstantCommand(
+            () -> m_pneumatic.toggleDSolenoid(7, Value.kForward),
+            m_pneumatic));
+				new JoystickButton(m_driverController2, 8)
+				.onTrue(new InstantCommand(
+						() -> m_pneumatic.toggleDSolenoid(7, Value.kReverse),
+						m_pneumatic));
+				new JoystickButton(m_driverController2, 10)
+				.onTrue(new InstantCommand(
+						() -> m_pneumatic.toggleSolenoid(5),
+						m_pneumatic));
+				new JoystickButton(m_driverController2, 5)
+        .onTrue(new RunCommand(
+            () -> m_arm.setArmStatus(1),
+          	m_arm));
+				new JoystickButton(m_driverController2, 5)
+        .onFalse(new RunCommand(
+            () -> m_arm.setArmStatus(0),
+          	m_arm));	
+				new JoystickButton(m_driverController2, 3)
+        .onTrue(new RunCommand(
+            () -> m_arm.setArmStatus(-1),
+          	m_arm));		
+				new JoystickButton(m_driverController2, 3)
+        .onFalse(new RunCommand(
+            () -> m_arm.setArmStatus(0),
+          	m_arm));	
+				new JoystickButton(m_driverController2, 12)
+				.onTrue(new RunCommand(
+						() -> m_arm.setElevatorStatus(1),
+						m_arm));
+				new JoystickButton(m_driverController2, 12)
+				.onFalse(new RunCommand(
+						() -> m_arm.setElevatorStatus(0),
+						m_arm));
+
   }
 
 	protected void configureSmartDashboard(){
@@ -112,9 +151,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(new Translation2d(0.6125, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
+        new Pose2d(1.25, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(
