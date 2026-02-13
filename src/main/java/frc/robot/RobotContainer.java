@@ -9,11 +9,14 @@ import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OverbumpSubsystem;
+import frc.robot.subsystems.ServoSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
@@ -25,8 +28,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final IntakeSubsystem m_armSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
   private final OverbumpSubsystem m_overbumpSubsystem = new OverbumpSubsystem();
+  private final ServoSubsystem m_servoSubsystem = new ServoSubsystem();
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -37,6 +41,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    
+    
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -50,13 +57,22 @@ public class RobotContainer {
                 true),
             m_robotDrive));
 
-     m_overbumpSubsystem.setDefaultCommand(
+/*   m_overbumpSubsystem.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_overbumpSubsystem.useOverbump(
                 -MathUtil.applyDeadband(((m_driverController.getRawAxis(3)+1)/2), OIConstants.kDriveDeadband)),
             m_overbumpSubsystem));
+*/
+    m_servoSubsystem.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> m_servoSubsystem.moveServo((m_driverController.getRawAxis(3))),
+            m_servoSubsystem));
+
+
   }
  
   
@@ -83,33 +99,71 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, 3)
         .whileTrue(  new RunCommand(
-            () -> m_armSubsystem.useIntake(.5),
-            m_armSubsystem));
+            () -> m_intakeSubsystem.useIntake(.5),
+            m_intakeSubsystem));
     
     new JoystickButton(m_driverController, 3)
         .whileFalse(  new RunCommand(
-            () -> m_armSubsystem.useIntake(0),
-            m_armSubsystem));
+            () -> m_intakeSubsystem.useIntake(0),
+            m_intakeSubsystem));
+    
+    new JoystickButton(m_driverController, 5)
+        .whileTrue(  new RunCommand(
+            () -> m_intakeSubsystem.useIntake(-0.5),
+            m_intakeSubsystem));
+    
+    new JoystickButton(m_driverController, 5)
+        .whileFalse(  new RunCommand(
+            () -> m_intakeSubsystem.useIntake(0),
+            m_intakeSubsystem));
 
     new JoystickButton(m_driverController, 2)
         .whileTrue(  new RunCommand(
-            () -> m_armSubsystem.spinUp(.5),
-            m_armSubsystem));   
+            () -> m_intakeSubsystem.spinUp(.45),
+            m_intakeSubsystem));   
             
     new JoystickButton(m_driverController, 2)
         .whileFalse(  new RunCommand(
-            () -> m_armSubsystem.spinUp(0),
-            m_armSubsystem));
+            () -> m_intakeSubsystem.spinUp(0),
+            m_intakeSubsystem));
 
     new JoystickButton(m_driverController, 1)
         .whileTrue(  new RunCommand(
-            () -> m_armSubsystem.useShooter(.5),
-            m_armSubsystem));
+            () -> m_intakeSubsystem.useShooter(.5),
+            m_intakeSubsystem));
 
      new JoystickButton(m_driverController, 1)
         .whileFalse(  new RunCommand(
-            () -> m_armSubsystem.useShooter(0),
-            m_armSubsystem));
+            () -> m_intakeSubsystem.useShooter(0),
+            m_intakeSubsystem));
+
+/*    new JoystickButton(m_driverController, 7).whileTrue(
+        new RunCommand(
+            () -> m_servoSubsystem.moveServo(600),
+            m_servoSubsystem));
+
+    new JoystickButton(m_driverController, 9).whileTrue(
+        new RunCommand(
+            () -> m_servoSubsystem.moveServo(800),
+            m_servoSubsystem));
+
+    new JoystickButton(m_driverController, 11).onTrue(
+        new RunCommand(
+            () -> m_servoSubsystem.moveServo(1000),
+            m_servoSubsystem));
+*/    
+    NamedCommands.registerCommand("spinUp", new RunCommand(
+            () -> m_intakeSubsystem.spinUp(.45),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("spinDown", new RunCommand(
+            () -> m_intakeSubsystem.spinUp(0),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("enableShooter", new RunCommand(
+            () -> m_intakeSubsystem.useShooter(.5),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("disableShooter", new RunCommand(
+            () -> m_intakeSubsystem.useShooter(0),
+            m_intakeSubsystem));
   }
 
 
@@ -119,6 +173,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-   return new PathPlannerAuto("Drive Test 1");
+   return new PathPlannerAuto("Shooting Test");
   }
 }
