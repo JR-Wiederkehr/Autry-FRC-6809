@@ -12,7 +12,7 @@ public class ServoSubsystem extends SubsystemBase {
     private final ServoHubConfig config = new ServoHubConfig();
     private final ServoChannel channel0 = servoHub.getServoChannel(ChannelId.kChannelId0);
 
-    public int target;
+    public double target;
 
     @SuppressWarnings("removal")
     public ServoSubsystem(){
@@ -26,7 +26,7 @@ public class ServoSubsystem extends SubsystemBase {
 
     channel0.setPowered(true);
     channel0.setEnabled(true);
-    channel0.setPulseWidth(600);
+    channel0.setPulseWidth(500);
 }
     
 
@@ -36,8 +36,12 @@ public class ServoSubsystem extends SubsystemBase {
         return Math.max(500, Math.min(2500, y));
     }
 
-    public void moveServo(double pose){
-        channel0.setPulseWidth(conversion(pose));
+    public void moveServo(){
+        channel0.setPulseWidth(conversion(target));
+    }
+
+    public void setServoTarget(double x){
+        target = x;
     }
 
 }

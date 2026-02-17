@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
@@ -69,7 +67,7 @@ public class RobotContainer {
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
-            () -> m_servoSubsystem.moveServo((m_driverController.getRawAxis(3))),
+            () -> m_servoSubsystem.moveServo(),
             m_servoSubsystem));
 
 
@@ -119,7 +117,7 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, 2)
         .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.spinUp(.45),
+            () -> m_intakeSubsystem.spinUp(1),
             m_intakeSubsystem));   
             
     new JoystickButton(m_driverController, 2)
@@ -137,33 +135,22 @@ public class RobotContainer {
             () -> m_intakeSubsystem.useShooter(0),
             m_intakeSubsystem));
 
-/*    new JoystickButton(m_driverController, 7).whileTrue(
+    new JoystickButton(m_driverController, 7).onTrue(
         new RunCommand(
-            () -> m_servoSubsystem.moveServo(600),
+            () -> m_servoSubsystem.setServoTarget(-1),
             m_servoSubsystem));
 
-    new JoystickButton(m_driverController, 9).whileTrue(
+    new JoystickButton(m_driverController, 9).onTrue(
         new RunCommand(
-            () -> m_servoSubsystem.moveServo(800),
+            () -> m_servoSubsystem.setServoTarget(0),
             m_servoSubsystem));
 
     new JoystickButton(m_driverController, 11).onTrue(
         new RunCommand(
-            () -> m_servoSubsystem.moveServo(1000),
+            () -> m_servoSubsystem.setServoTarget(1),
             m_servoSubsystem));
-*/    
-    NamedCommands.registerCommand("spinUp", new RunCommand(
-            () -> m_intakeSubsystem.spinUp(.45),
-            m_intakeSubsystem));
-    NamedCommands.registerCommand("spinDown", new RunCommand(
-            () -> m_intakeSubsystem.spinUp(0),
-            m_intakeSubsystem));
-    NamedCommands.registerCommand("enableShooter", new RunCommand(
-            () -> m_intakeSubsystem.useShooter(.5),
-            m_intakeSubsystem));
-    NamedCommands.registerCommand("disableShooter", new RunCommand(
-            () -> m_intakeSubsystem.useShooter(0),
-            m_intakeSubsystem));
+    
+
   }
 
 

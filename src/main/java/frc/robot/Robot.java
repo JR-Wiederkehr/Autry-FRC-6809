@@ -4,9 +4,13 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +22,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private IntakeSubsystem m_intakeSubsystem;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -25,8 +30,21 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    m_intakeSubsystem = new IntakeSubsystem();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    NamedCommands.registerCommand("spinUp", new RunCommand(
+            () -> m_intakeSubsystem.spinUp(.45),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("spinDown", new RunCommand(
+            () -> m_intakeSubsystem.spinUp(0),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("enableShooter", new RunCommand(
+            () -> m_intakeSubsystem.useShooter(.5),
+            m_intakeSubsystem));
+    NamedCommands.registerCommand("disableShooter", new RunCommand(
+            () -> m_intakeSubsystem.useShooter(0),
+            m_intakeSubsystem));
     m_robotContainer = new RobotContainer();
   }
 
