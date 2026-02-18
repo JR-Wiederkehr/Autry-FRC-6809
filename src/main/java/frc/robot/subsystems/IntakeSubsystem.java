@@ -8,6 +8,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax upperIntakeMotor = new SparkMax(9, MotorType.kBrushless);
     private final SparkFlex lowerIntakeMotor = new SparkFlex(10, MotorType.kBrushless);
     private final SparkFlex shooterMotor = new SparkFlex(11, MotorType.kBrushless);
+    private final SparkFlex agitatorMotor = new SparkFlex(13, MotorType.kBrushless);
     public IntakeSubsystem(){
 
     }
@@ -24,5 +25,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public void useShooter(double speed){
         upperIntakeMotor.set(-speed);
         lowerIntakeMotor.set(speed);
+        agitatorMotor.set(speed);
     }
 }

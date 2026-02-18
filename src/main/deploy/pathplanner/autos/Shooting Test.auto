@@ -7,6 +7,18 @@
         {
           "type": "named",
           "data": {
+            "name": "servoPos1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "moveServo"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "spinUp"
           }
         },
@@ -25,7 +37,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 2.0
           }
         },
         {
@@ -43,7 +55,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

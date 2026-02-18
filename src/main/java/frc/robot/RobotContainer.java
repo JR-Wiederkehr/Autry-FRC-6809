@@ -26,9 +26,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = Robot.m_intakeSubsystem;
   private final OverbumpSubsystem m_overbumpSubsystem = new OverbumpSubsystem();
-  private final ServoSubsystem m_servoSubsystem = new ServoSubsystem();
+  private final ServoSubsystem m_servoSubsystem = Robot.m_servoSubsystem;
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -55,14 +55,14 @@ public class RobotContainer {
                 true),
             m_robotDrive));
 
-/*   m_overbumpSubsystem.setDefaultCommand(
+   m_overbumpSubsystem.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_overbumpSubsystem.useOverbump(
                 -MathUtil.applyDeadband(((m_driverController.getRawAxis(3)+1)/2), OIConstants.kDriveDeadband)),
             m_overbumpSubsystem));
-*/
+
     m_servoSubsystem.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -117,7 +117,7 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, 2)
         .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.spinUp(1),
+            () -> m_intakeSubsystem.spinUp(.48),
             m_intakeSubsystem));   
             
     new JoystickButton(m_driverController, 2)
@@ -136,17 +136,17 @@ public class RobotContainer {
             m_intakeSubsystem));
 
     new JoystickButton(m_driverController, 7).onTrue(
-        new RunCommand(
+        new InstantCommand(
             () -> m_servoSubsystem.setServoTarget(-1),
             m_servoSubsystem));
 
     new JoystickButton(m_driverController, 9).onTrue(
-        new RunCommand(
+        new InstantCommand(
             () -> m_servoSubsystem.setServoTarget(0),
             m_servoSubsystem));
 
     new JoystickButton(m_driverController, 11).onTrue(
-        new RunCommand(
+        new InstantCommand(
             () -> m_servoSubsystem.setServoTarget(1),
             m_servoSubsystem));
     

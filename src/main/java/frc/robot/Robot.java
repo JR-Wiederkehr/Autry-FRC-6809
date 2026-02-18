@@ -9,8 +9,10 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ServoSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,7 +24,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private IntakeSubsystem m_intakeSubsystem;
+  static IntakeSubsystem m_intakeSubsystem;
+  static ServoSubsystem m_servoSubsystem;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -31,20 +34,30 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_intakeSubsystem = new IntakeSubsystem();
+    m_servoSubsystem = new ServoSubsystem();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    NamedCommands.registerCommand("spinUp", new RunCommand(
-            () -> m_intakeSubsystem.spinUp(.45),
+    NamedCommands.registerCommand("spinUp", new InstantCommand(
+            () -> m_intakeSubsystem.spinUp(.48),
             m_intakeSubsystem));
-    NamedCommands.registerCommand("spinDown", new RunCommand(
+    NamedCommands.registerCommand("spinDown", new InstantCommand(
             () -> m_intakeSubsystem.spinUp(0),
             m_intakeSubsystem));
-    NamedCommands.registerCommand("enableShooter", new RunCommand(
+    NamedCommands.registerCommand("enableShooter", new InstantCommand(
             () -> m_intakeSubsystem.useShooter(.5),
             m_intakeSubsystem));
-    NamedCommands.registerCommand("disableShooter", new RunCommand(
+    NamedCommands.registerCommand("disableShooter", new InstantCommand(
             () -> m_intakeSubsystem.useShooter(0),
             m_intakeSubsystem));
+    NamedCommands.registerCommand("servoPos1", new InstantCommand(
+            () -> m_servoSubsystem.setServoTarget(1),
+            m_servoSubsystem));
+    NamedCommands.registerCommand("servoPos2", new InstantCommand(
+            () -> m_servoSubsystem.setServoTarget(-1),
+            m_servoSubsystem));
+    NamedCommands.registerCommand("moveServo", new InstantCommand(
+            () -> m_servoSubsystem.moveServo(),
+            m_servoSubsystem));
     m_robotContainer = new RobotContainer();
   }
 
