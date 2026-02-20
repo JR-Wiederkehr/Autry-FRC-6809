@@ -6,10 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OverbumpSubsystem;
 import frc.robot.subsystems.ServoSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -29,6 +31,7 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = Robot.m_intakeSubsystem;
   private final OverbumpSubsystem m_overbumpSubsystem = new OverbumpSubsystem();
   private final ServoSubsystem m_servoSubsystem = Robot.m_servoSubsystem;
+  private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -85,7 +88,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, 4)
+    new JoystickButton(m_driverController, 10)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
@@ -149,6 +152,31 @@ public class RobotContainer {
         new InstantCommand(
             () -> m_servoSubsystem.setServoTarget(1),
             m_servoSubsystem));
+
+    new JoystickButton(m_driverController, 6)
+        .whileTrue(  new RunCommand(
+            () -> m_climbSubsystem.useClimber(.5),
+            m_climbSubsystem));
+    
+
+    new JoystickButton(m_driverController, 4)
+        .whileTrue(  new RunCommand(
+            () -> m_climbSubsystem.useClimber(-.5),
+            m_climbSubsystem));
+    
+    new JoystickButton(m_driverController, 6)
+        .whileFalse(  new RunCommand(
+            () -> {if (m_driverController.getRawButton(4) == false){
+        m_climbSubsystem.useClimber(0.0);
+            }},
+            m_climbSubsystem));
+    
+    new JoystickButton(m_driverController, 4)
+        .whileFalse(  new RunCommand(
+            () -> {if (m_driverController.getRawButton(6) == false){
+        m_climbSubsystem.useClimber(0.0);
+            }},
+            m_climbSubsystem));
     
 
   }
