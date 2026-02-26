@@ -161,7 +161,7 @@ public class RobotContainer {
             m_servoSubsystem));
 
 
-    m_driverController.a()
+    m_driverController.b()
         .onTrue(
         new InstantCommand(() -> 
             m_servoSubsystem.setServoTarget(1),
