@@ -16,7 +16,11 @@ import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj.XboxController.Button;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
@@ -34,7 +38,7 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
   // The driver's controller
-  Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(2);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -52,9 +56,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getRawAxis(1)* .5, OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRawAxis(0)* .5, OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRawAxis(2)* .5, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftY()* .5, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX()* .5, OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX()* .5, OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
 
@@ -63,7 +67,7 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_overbumpSubsystem.useOverbump(
-                -MathUtil.applyDeadband(((m_driverController.getRawAxis(3)+1)/2), OIConstants.kDriveDeadband)),
+                -MathUtil.applyDeadband(m_driverController.getRightY(), OIConstants.kDriveDeadband)),
             m_overbumpSubsystem));
 
     m_servoSubsystem.setDefaultCommand(
@@ -88,94 +92,108 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, 10)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
+    m_driverController.leftStick()
+        .whileTrue(
+        new RunCommand(() -> 
+        m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, 8)
-        .onTrue(new InstantCommand(
-            () -> m_robotDrive.zeroHeading(),
+    m_driverController.start()
+        .onTrue(
+        new InstantCommand(() -> 
+            m_robotDrive.zeroHeading(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, 3)
-        .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.useIntake(.5),
+    m_driverController.rightTrigger()
+        .whileTrue(  
+        new RunCommand(() -> 
+            m_intakeSubsystem.useIntake(.5),
+            m_intakeSubsystem));
+        
+    
+    m_driverController.rightTrigger()
+        .whileFalse(
+        new RunCommand(() -> 
+            m_intakeSubsystem.useIntake(0),
+            m_intakeSubsystem));
+        
+    
+    m_driverController.rightBumper()
+        .whileTrue(
+        new RunCommand(() -> 
+            m_intakeSubsystem.useIntake(-0.5),
             m_intakeSubsystem));
     
-    new JoystickButton(m_driverController, 3)
-        .whileFalse(  new RunCommand(
-            () -> m_intakeSubsystem.useIntake(0),
-            m_intakeSubsystem));
-    
-    new JoystickButton(m_driverController, 5)
-        .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.useIntake(-0.5),
-            m_intakeSubsystem));
-    
-    new JoystickButton(m_driverController, 5)
-        .whileFalse(  new RunCommand(
-            () -> m_intakeSubsystem.useIntake(0),
+    m_driverController.rightBumper()
+        .whileFalse(
+        new RunCommand(() -> 
+            m_intakeSubsystem.useIntake(0),
             m_intakeSubsystem));
 
-    new JoystickButton(m_driverController, 2)
-        .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.spinUp(.48),
+    m_driverController.leftTrigger()
+        .whileTrue(
+        new RunCommand(() -> 
+            m_intakeSubsystem.spinUp(.48),
             m_intakeSubsystem));   
             
-    new JoystickButton(m_driverController, 2)
-        .whileFalse(  new RunCommand(
-            () -> m_intakeSubsystem.spinUp(0),
+    m_driverController.leftTrigger()
+        .whileFalse(
+        new RunCommand(() -> 
+            m_intakeSubsystem.spinUp(0),
+            m_intakeSubsystem));   
+
+    m_driverController.leftBumper()
+        .whileTrue(  
+        new RunCommand(() -> 
+            m_intakeSubsystem.useShooter(.5),
             m_intakeSubsystem));
 
-    new JoystickButton(m_driverController, 1)
-        .whileTrue(  new RunCommand(
-            () -> m_intakeSubsystem.useShooter(.5),
+     m_driverController.leftBumper()
+        .whileFalse(  
+        new RunCommand(() -> 
+            m_intakeSubsystem.useShooter(0),
             m_intakeSubsystem));
 
-     new JoystickButton(m_driverController, 1)
-        .whileFalse(  new RunCommand(
-            () -> m_intakeSubsystem.useShooter(0),
-            m_intakeSubsystem));
-
-    new JoystickButton(m_driverController, 7).onTrue(
-        new InstantCommand(
-            () -> m_servoSubsystem.setServoTarget(-1),
+    m_driverController.a()
+        .onTrue(
+        new InstantCommand(() -> 
+            m_servoSubsystem.setServoTarget(-1),
             m_servoSubsystem));
 
-    new JoystickButton(m_driverController, 9).onTrue(
-        new InstantCommand(
-            () -> m_servoSubsystem.setServoTarget(0),
+
+    m_driverController.a()
+        .onTrue(
+        new InstantCommand(() -> 
+            m_servoSubsystem.setServoTarget(1),
             m_servoSubsystem));
 
-    new JoystickButton(m_driverController, 11).onTrue(
-        new InstantCommand(
-            () -> m_servoSubsystem.setServoTarget(1),
-            m_servoSubsystem));
-
-    new JoystickButton(m_driverController, 6)
-        .whileTrue(  new RunCommand(
-            () -> m_climbSubsystem.useClimber(.5),
+    m_driverController.povUp()
+        .whileTrue(  
+        new RunCommand(() -> 
+            m_climbSubsystem.useClimber(.5),
             m_climbSubsystem));
     
 
-    new JoystickButton(m_driverController, 4)
-        .whileTrue(  new RunCommand(
-            () -> m_climbSubsystem.useClimber(-.5),
+    m_driverController.povDown()
+        .whileTrue(  
+        new RunCommand(() -> 
+            m_climbSubsystem.useClimber(-.5),
             m_climbSubsystem));
     
-    new JoystickButton(m_driverController, 6)
-        .whileFalse(  new RunCommand(
-            () -> {if (m_driverController.getRawButton(4) == false){
-        m_climbSubsystem.useClimber(0.0);
-            }},
+    m_driverController.povUp()
+        .whileFalse(  
+        new RunCommand(() -> 
+        {if (m_driverController.povDown().getAsBoolean() == false){
+            m_climbSubsystem.useClimber(0.0);
+        }},
             m_climbSubsystem));
     
-    new JoystickButton(m_driverController, 4)
-        .whileFalse(  new RunCommand(
-            () -> {if (m_driverController.getRawButton(6) == false){
-        m_climbSubsystem.useClimber(0.0);
-            }},
+    m_driverController.povDown()
+        .whileFalse(  
+        new RunCommand(() -> 
+        {if (m_driverController.povUp().getAsBoolean() == false){
+            m_climbSubsystem.useClimber(0.0);
+        }},
             m_climbSubsystem));
     
 
