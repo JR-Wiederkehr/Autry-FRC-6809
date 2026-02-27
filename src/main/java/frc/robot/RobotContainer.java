@@ -18,9 +18,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj.XboxController.Axis;
-import edu.wpi.first.wpilibj.XboxController.Button;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
@@ -39,6 +36,7 @@ public class RobotContainer {
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(2);
+  Joystick m_driverController2 = new Joystick(1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -154,44 +152,44 @@ public class RobotContainer {
             m_intakeSubsystem.useShooter(0),
             m_intakeSubsystem));
 
-    m_driverController.a()
+    new JoystickButton(m_driverController2, 12)
         .onTrue(
         new InstantCommand(() -> 
             m_servoSubsystem.setServoTarget(-1),
             m_servoSubsystem));
 
 
-    m_driverController.b()
-        .onTrue(
+    new JoystickButton(m_driverController2, 12)
+        .onFalse(
         new InstantCommand(() -> 
             m_servoSubsystem.setServoTarget(1),
             m_servoSubsystem));
 
-    m_driverController.povUp()
+    new JoystickButton(m_driverController2, 4)
         .whileTrue(  
         new RunCommand(() -> 
             m_climbSubsystem.useClimber(.5),
             m_climbSubsystem));
     
 
-    m_driverController.povDown()
+    new JoystickButton(m_driverController2, 10)
         .whileTrue(  
         new RunCommand(() -> 
             m_climbSubsystem.useClimber(-.5),
             m_climbSubsystem));
     
-    m_driverController.povUp()
+    new JoystickButton(m_driverController2, 4)
         .whileFalse(  
         new RunCommand(() -> 
-        {if (m_driverController.povDown().getAsBoolean() == false){
+        {if (m_driverController2.getRawButton(10) == false){
             m_climbSubsystem.useClimber(0.0);
         }},
             m_climbSubsystem));
     
-    m_driverController.povDown()
+    new JoystickButton(m_driverController2, 10)
         .whileFalse(  
         new RunCommand(() -> 
-        {if (m_driverController.povUp().getAsBoolean() == false){
+        {if (m_driverController2.getRawButton(4) == false){
             m_climbSubsystem.useClimber(0.0);
         }},
             m_climbSubsystem));

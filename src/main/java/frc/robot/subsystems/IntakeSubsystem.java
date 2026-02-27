@@ -16,6 +16,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public void useIntake(double speed){
         upperIntakeMotor.set(speed);
         lowerIntakeMotor.set(speed);
+        agitatorMotor.set(speed);
     }
 
     public void spinUp(double speed){
