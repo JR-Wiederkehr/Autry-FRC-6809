@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     NamedCommands.registerCommand("spinUp", new InstantCommand(
-            () -> m_intakeSubsystem.spinUp(.48),
+            () -> m_intakeSubsystem.spinUp(-3000),
             m_intakeSubsystem));
     NamedCommands.registerCommand("spinDown", new InstantCommand(
             () -> m_intakeSubsystem.spinUp(0),

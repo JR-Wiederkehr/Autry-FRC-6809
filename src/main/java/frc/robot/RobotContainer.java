@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OverbumpSubsystem;
@@ -18,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
@@ -35,8 +39,9 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
 
   // The driver's controller
-  CommandXboxController m_driverController = new CommandXboxController(2);
-  Joystick m_driverController2 = new Joystick(1);
+  CommandXboxController m_driverController = new CommandXboxController(1);
+  Joystick m_driverController2 = new Joystick(0);
+  private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -44,6 +49,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    autoChooser = AutoBuilder.buildAutoChooser("Shooting Test");
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     
     
@@ -126,19 +133,18 @@ public class RobotContainer {
         .whileFalse(
         new RunCommand(() -> 
             m_intakeSubsystem.useIntake(0),
+            m_intakeSubsystem));  
+    
+    new JoystickButton(m_driverController2, 9)
+        .onTrue(
+        new InstantCommand(() -> 
+            m_intakeSubsystem.spinUp(-3000),
             m_intakeSubsystem));
-
-    m_driverController.leftTrigger()
-        .whileTrue(
-        new RunCommand(() -> 
-            m_intakeSubsystem.spinUp(.48),
-            m_intakeSubsystem));   
-            
-    m_driverController.leftTrigger()
-        .whileFalse(
-        new RunCommand(() -> 
+    new JoystickButton(m_driverController2, 9)
+        .onFalse(
+        new InstantCommand(() -> 
             m_intakeSubsystem.spinUp(0),
-            m_intakeSubsystem));   
+            m_intakeSubsystem));
 
     m_driverController.leftBumper()
         .whileTrue(  
@@ -204,6 +210,5 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-   return new PathPlannerAuto("Shooting Test");
-  }
-}
+   return autoChooser.getSelected();
+}}
